@@ -1,0 +1,377 @@
+import { PlatformAccount, KYCData, PromptTemplate, MonthlyPlan, DistributionJob, RevenueTransaction } from "../types";
+
+export const INITIAL_ACCOUNTS: PlatformAccount[] = [
+  {
+    id: "acc_yt_1",
+    platform: "youtube",
+    platformName: "YouTube Partner",
+    accountName: "Canal Monetización IA & Tech",
+    handle: "@MonetizaIA_Oficial",
+    status: "active",
+    revenueVelocity: 0.045, // $0.045 / min (~$64.80/day)
+    totalEarned: 1842.50,
+    followersOrSubs: 48600,
+    metricLabel: "Vistas Últimos 28d",
+    metricValue: "428,900",
+    monetizationStatus: "Aprobado / Activo",
+    payoutMethod: "Google AdSense -> Transferencia Bancaria",
+    payoutAddress: "ES48 2100 **** **** 8841",
+    lastSync: "Hace 2 min",
+    category: "Video",
+    badgeColor: "bg-red-500/10 text-red-400 border-red-500/30",
+    logoIcon: "Youtube",
+    requirements: [
+      { label: "Suscriptores", current: 48600, target: 1000, unit: "subs" },
+      { label: "Horas de Reproducción", current: 14200, target: 4000, unit: "hrs" }
+    ]
+  },
+  {
+    id: "acc_spotify_1",
+    platform: "spotify",
+    platformName: "Spotify & Apple Music",
+    accountName: "Beats & Ambient Royalties Studio",
+    handle: "DistroKid: Artist #8912",
+    status: "active",
+    revenueVelocity: 0.028, // $0.028 / min
+    totalEarned: 894.20,
+    followersOrSubs: 19400,
+    metricLabel: "Streams Mensuales",
+    metricValue: "284,500",
+    monetizationStatus: "Aprobado / Activo",
+    payoutMethod: "DistroKid Direct Payout",
+    payoutAddress: "paypal@creadordigital.com",
+    lastSync: "Hace 10 min",
+    category: "Audio",
+    badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+    logoIcon: "Music"
+  },
+  {
+    id: "acc_pinterest_1",
+    platform: "pinterest",
+    platformName: "Pinterest Business Hub",
+    accountName: "Tráfico & Afiliados Directos",
+    handle: "@ViralPins_Empire",
+    status: "active",
+    revenueVelocity: 0.035, // $0.035 / min
+    totalEarned: 1120.80,
+    followersOrSubs: 82300,
+    metricLabel: "Clics Salientes / mes",
+    metricValue: "64,200",
+    monetizationStatus: "Verificado",
+    payoutMethod: "Enlaces de Afiliados / Shopify",
+    payoutAddress: "https://tienda.creadordigital.com/?ref=pin",
+    lastSync: "Hace 5 min",
+    category: "Tráfico",
+    badgeColor: "bg-rose-500/10 text-rose-400 border-rose-500/30",
+    logoIcon: "Flame"
+  },
+  {
+    id: "acc_tiktok_1",
+    platform: "tiktok",
+    platformName: "TikTok Creator & Shop",
+    accountName: "TikTok Shop Promos & Viral",
+    handle: "@monetizacion_rapida",
+    status: "active",
+    revenueVelocity: 0.040, // $0.040 / min
+    totalEarned: 1530.15,
+    followersOrSubs: 135000,
+    metricLabel: "Comisiones TikTok Shop",
+    metricValue: "$1,530.15",
+    monetizationStatus: "Aprobado / Activo",
+    payoutMethod: "TikTok Payout -> PayPal",
+    payoutAddress: "paypal@creadordigital.com",
+    lastSync: "Hace 1 min",
+    category: "Redes",
+    badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
+    logoIcon: "Video"
+  },
+  {
+    id: "acc_ig_1",
+    platform: "instagram",
+    platformName: "Instagram Funnel Pro",
+    accountName: "Reels & Stories Conversion",
+    handle: "@monetiza_pro_oficial",
+    status: "active",
+    revenueVelocity: 0.032,
+    totalEarned: 980.40,
+    followersOrSubs: 67200,
+    metricLabel: "Conversión de Enlaces Bio",
+    metricValue: "4.8% CTR",
+    monetizationStatus: "Verificado",
+    payoutMethod: "ManyChat + Gumroad Links",
+    payoutAddress: "https://gumroad.com/l/ia-pack",
+    lastSync: "Hace 8 min",
+    category: "Redes",
+    badgeColor: "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30",
+    logoIcon: "Instagram"
+  },
+  {
+    id: "acc_shopify_1",
+    platform: "shopify",
+    platformName: "Shopify E-Commerce",
+    accountName: "Digital Assets Store Global",
+    handle: "store-monetiza.myshopify.com",
+    status: "active",
+    revenueVelocity: 0.065, // $0.065 / min
+    totalEarned: 2450.00,
+    followersOrSubs: 1420,
+    metricLabel: "Órdenes Procesadas",
+    metricValue: "348 pedidos",
+    monetizationStatus: "Aprobado / Activo",
+    payoutMethod: "Shopify Payments -> Cuenta Bancaria",
+    payoutAddress: "Cuenta Principal IBAN **** 4912",
+    lastSync: "Hace 30 seg",
+    category: "E-commerce",
+    badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+    logoIcon: "ShoppingBag"
+  },
+  {
+    id: "acc_paypal_1",
+    platform: "paypal",
+    platformName: "PayPal Merchant Gateway",
+    accountName: "Cobros & Pagos Instantáneos",
+    handle: "paypal.me/monetiza_ia",
+    status: "active",
+    revenueVelocity: 0.050,
+    totalEarned: 3120.75,
+    followersOrSubs: 0,
+    metricLabel: "Saldo Disponible",
+    metricValue: "$1,840.20",
+    monetizationStatus: "Verificado",
+    payoutMethod: "Retiro Inmediato 24/7",
+    payoutAddress: "paypal@creadordigital.com",
+    lastSync: "Hace 15 seg",
+    category: "Pasarela",
+    badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+    logoIcon: "CreditCard"
+  },
+  {
+    id: "acc_binance_1",
+    platform: "binance",
+    platformName: "Binance Crypto Pay",
+    accountName: "Pasarela Global Cripto USDT",
+    handle: "Binance Pay ID: 74829103",
+    status: "active",
+    revenueVelocity: 0.038,
+    totalEarned: 1980.50,
+    followersOrSubs: 0,
+    metricLabel: "Volumen Recibido USDT",
+    metricValue: "1,980.50 USDT",
+    monetizationStatus: "Verificado",
+    payoutMethod: "Billetera Spot / TRC20 / BEP20",
+    payoutAddress: "TX9K...88vL (USDT TRC20)",
+    lastSync: "En Vivo",
+    category: "Cripto",
+    badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+    logoIcon: "Coins"
+  }
+];
+
+export const INITIAL_KYC: KYCData = {
+  isVerified: true,
+  documentType: "DNI",
+  documentNumber: "48920194-K",
+  fullName: "Miguel A. Rodriguez",
+  country: "España / Global",
+  birthDate: "1994-06-14",
+  biometricMatchScore: 98.4,
+  livenessPassed: true,
+  certificateId: "KYC-BIO-2026-9941X",
+  verifiedAt: "2026-08-15T10:30:00Z",
+  status: "APROBADO_BIOMETRICO",
+  verificationHash: "0x8fa372bc90a1e457f8819230ab01e99c4d2"
+};
+
+export const INITIAL_PROMPTS: PromptTemplate[] = [
+  {
+    id: "pr_1",
+    title: "Gancho Psicológico Viral para YouTube Shorts & TikTok",
+    platform: "youtube",
+    niche: "Finanzas & Monetización",
+    objective: "Retención del 90% y CTA para comprar plantilla",
+    promptText: "Actúa como guionista experto en viralidad de video corto. Crea un guion de 40 segundos para {NICHO} que empiece con el gancho: '{GANCHO_NEGATIVO}'. Estructura: 0-3s Desarmar creencia limitante, 3-20s Demostración del método rápido con {HERRAMIENTA_IA}, 20-35s Prueba de ingresos de $0.01 por segundo en vivo, 35-40s CTA urgente para hacer clic en el enlace de la biografía/comentario fijado.",
+    tokensEstimated: 320,
+    costEstimated: "$0.00005",
+    monetizationAngle: "Urgencia, prueba visual de ingresos y enlace directo a pasarela de pago",
+    variables: ["{NICHO}", "{GANCHO_NEGATIVO}", "{HERRAMIENTA_IA}"],
+    conversionRate: "8.4% CTR",
+    isFavorite: true
+  },
+  {
+    id: "pr_2",
+    title: "Fórmula de Pin Magnético para Pinterest con Tráfico a Shopify",
+    platform: "pinterest",
+    niche: "E-Commerce Digital",
+    objective: "Generar clics salientes continuos a tienda online",
+    promptText: "Escribe 5 variaciones de Título SEO y Descripción para Pinterest optimizados para la palabra clave {KEYWORD_PRINCIPAL}. Cada pin debe incluir palabras de intención de compra (ej: Descarga, Plantilla, Automatización), 3 hashtags de alto volumen, y una llamada clara: 'Haz clic en el enlace para adquirir tu copia instantánea antes de que suba de precio'.",
+    tokensEstimated: 280,
+    costEstimated: "$0.00004",
+    monetizationAngle: "SEO de búsqueda orgánica con enlace directo a checkout de Shopify/PayPal",
+    variables: ["{KEYWORD_PRINCIPAL}", "{PRECIO_OFERTA}"],
+    conversionRate: "12.1% Clics",
+    isFavorite: true
+  },
+  {
+    id: "pr_3",
+    title: "Secuencia de Story de Instagram con Cierre en Direct Message / Link",
+    platform: "instagram",
+    niche: "Cursos & Asesorías",
+    objective: "Vender producto digital de $27 - $97 en automático",
+    promptText: "Diseña una secuencia de 4 Stories de Instagram: Story 1: Encuesta de dolor ('¿Sigues cambiando tiempo por dinero?'), Story 2: Captura de pantalla mostrando ventas automáticas en PayPal/Binance mientras dormías, Story 3: Explicación del sistema en 3 viñetas breves, Story 4: Sticker de enlace directo a la página de pago + Bonus de 24h.",
+    tokensEstimated: 310,
+    costEstimated: "$0.00005",
+    monetizationAngle: "Embudo de micro-compromiso con cierre de venta directa",
+    variables: ["{PROBLEMA_CLIENTE}", "{NOMBRE_PRODUCTO}"],
+    conversionRate: "6.9% Conversión",
+    isFavorite: false
+  },
+  {
+    id: "pr_4",
+    title: "Copywriting de Página de Venta E-Commerce / Shopify",
+    platform: "shopify",
+    niche: "Infoproductos",
+    objective: "Maximizar conversión en checkout",
+    promptText: "Redacta el texto de una página de producto en Shopify para {NOMBRE_PRODUCTO} a un precio de {PRECIO}. Incluye: Título hipnótico, 5 beneficios transformacionales en viñetas, prueba social garantizada, sección de preguntas frecuentes que derriba objeciones de pago con PayPal o Binance USDT, y botón de compra con garantía de satisfacción.",
+    tokensEstimated: 460,
+    costEstimated: "$0.00008",
+    monetizationAngle: "Página de venta directa con checkout multi-divisa",
+    variables: ["{NOMBRE_PRODUCTO}", "{PRECIO}", "{TIEMPO_ENTREGA}"],
+    conversionRate: "4.2% Venta",
+    isFavorite: true
+  }
+];
+
+export const INITIAL_PLAN_DAYS: MonthlyPlan = {
+  id: "plan_month_1",
+  planName: "Plan Maestro de Monetización 30 Días - Sistema Automático",
+  monthlyTarget: "$3,500 USD",
+  dailyPacingTarget: "$116.66 / día (~$0.08 / min)",
+  strategyOverview: "Estrategia cross-platform 360°: Captación masiva en Pinterest y YouTube Shorts, monetización inmediata con enlaces a Shopify, PayPal y Binance USDT, respaldado con ingresos residuales de Spotify Streams.",
+  createdAt: "2026-08-01",
+  days: [
+    { day: 1, platform: "YouTube", actionType: "Gancho & Tráfico", title: "Short: Cómo iniciar un negocio digital con IA", promptToExecute: "Guion de 40s sobre 3 herramientas de monetización", monetizationGoal: "$45.00", status: "Monetizado", actualRevenue: 52.40 },
+    { day: 2, platform: "Pinterest", actionType: "Tráfico Afiliados", title: "3 Pines infográficos a tienda Shopify", promptToExecute: "Copy SEO para pines de plantillas digitales", monetizationGoal: "$60.00", status: "Monetizado", actualRevenue: 78.10 },
+    { day: 3, platform: "TikTok", actionType: "Venta Directa", title: "Demostración de producto digital en vivo", promptToExecute: "Guion con gancho 'Miren cuánto facturó este prompt'", monetizationGoal: "$80.00", status: "Monetizado", actualRevenue: 95.00 },
+    { day: 4, platform: "Instagram", actionType: "Secuencia Stories", title: "Embudo de 4 stories con sticker de PayPal", promptToExecute: "Secuencia dolor -> solución -> enlace de pago", monetizationGoal: "$70.00", status: "Monetizado", actualRevenue: 84.50 },
+    { day: 5, platform: "Spotify", actionType: "Regalías Audio", title: "Subir 2 tracks lo-fi a distribuidores", promptToExecute: "Metadatos y tags para playlists de estudio", monetizationGoal: "$30.00", status: "Publicado", actualRevenue: 34.20 },
+    { day: 6, platform: "Shopify", actionType: "Lanzamiento Oferta", title: "Crear bundle de 3 productos a $19.99", promptToExecute: "Copy de página de producto para bundle", monetizationGoal: "$120.00", status: "Monetizado", actualRevenue: 140.00 },
+    { day: 7, platform: "Binance", actionType: "Cripto Checkout", title: "Activar descuento 15% pagando en USDT", promptToExecute: "Post de Twitter/Telegram anunciando pago web3", monetizationGoal: "$90.00", status: "Publicado", actualRevenue: 105.00 },
+    { day: 8, platform: "YouTube", actionType: "Tutorial Largo", title: "Video de 8 min con 5 enlaces de afiliados", promptToExecute: "Estructura de video largo con timestamps", monetizationGoal: "$110.00", status: "En Progreso", actualRevenue: 40.00 },
+    { day: 9, platform: "Pinterest", actionType: "Tráfico Masivo", title: "Pines de video con audio en tendencia", promptToExecute: "Guion visual para pines con video", monetizationGoal: "$75.00", status: "Pendiente" },
+    { day: 10, platform: "TikTok", actionType: "TikTok Shop", title: "Review de accesorio con link de afiliado", promptToExecute: "Estructura de review auténtico con CTA", monetizationGoal: "$100.00", status: "Pendiente" },
+    { day: 11, platform: "Instagram", actionType: "Reel Colaborativo", title: "Reel sobre automatización de ingresos", promptToExecute: "Gancho de curiosidad + CTA a DM", monetizationGoal: "$85.00", status: "Pendiente" },
+    { day: 12, platform: "Shopify", actionType: "Email Marketing", title: "Campaña de recuperación de carritos", promptToExecute: "Secuencia de 3 emails de urgencia", monetizationGoal: "$130.00", status: "Pendiente" },
+    { day: 13, platform: "YouTube", actionType: "Shorts Fund", title: "3 Shorts diarios programados", promptToExecute: "Pack de 3 micro-guiones de 15 segundos", monetizationGoal: "$95.00", status: "Pendiente" },
+    { day: 14, platform: "PayPal", actionType: "Oferta Flash", title: "Venta express 24h vía link directo", promptToExecute: "Copy de venta rápida para WhatsApp/Telegram", monetizationGoal: "$150.00", status: "Pendiente" },
+    { day: 15, platform: "Spotify", actionType: "Playlist Pitch", title: "Enviar track a 10 curadores de playlists", promptToExecute: "Pitch email personalizado a curadores", monetizationGoal: "$40.00", status: "Pendiente" },
+    { day: 16, platform: "Pinterest", actionType: "Carruseles", title: "2 Carruseles paso a paso", promptToExecute: "Diseño y texto de carrusel educativo", monetizationGoal: "$65.00", status: "Pendiente" },
+    { day: 17, platform: "TikTok", actionType: "Trend Audio", title: "Aprovechar sonido viral con gancho financiero", promptToExecute: "Adaptación de trend con texto en pantalla", monetizationGoal: "$110.00", status: "Pendiente" },
+    { day: 18, platform: "Binance", actionType: "Web3 Invoice", title: "Promoción internacional para LATAM y Europa", promptToExecute: "Guía de compra fácil con Binance Pay", monetizationGoal: "$100.00", status: "Pendiente" },
+    { day: 19, platform: "Instagram", actionType: "Transmisión en Vivo", title: "Live de 20 min respondiendo dudas y vendiendo", promptToExecute: "Estructura de venta en vivo con oferta exclusiva", monetizationGoal: "$160.00", status: "Pendiente" },
+    { day: 20, platform: "Shopify", actionType: "Upsell Post-Compra", title: "Configurar oferta de 1 clic post-pago", promptToExecute: "Copy de upsell irresistible con 50% off", monetizationGoal: "$140.00", status: "Pendiente" },
+    { day: 21, platform: "YouTube", actionType: "Comunidad", title: "Encuesta + Post de comunidad con link de oferta", promptToExecute: "Texto persuasivo para pestaña comunidad", monetizationGoal: "$70.00", status: "Pendiente" },
+    { day: 22, platform: "Pinterest", actionType: "Idea Pins", title: "3 Idea Pins con enlaces a blog monetizado", promptToExecute: "Guion de idea pin con alta retención", monetizationGoal: "$80.00", status: "Pendiente" },
+    { day: 23, platform: "TikTok", actionType: "Storytelling", title: "Historia de cómo pasé de $0 a $100/día", promptToExecute: "Estructura de viaje del héroe en 60s", monetizationGoal: "$125.00", status: "Pendiente" },
+    { day: 24, platform: "PayPal", actionType: "Suscripción Recurrente", title: "Lanzar membresía de prompts mensuales ($9/mes)", promptToExecute: "Página de venta para suscripción", monetizationGoal: "$180.00", status: "Pendiente" },
+    { day: 25, platform: "Spotify", actionType: "Podcast Express", title: "Subir micro-podcast de 5 min con patrocinio", promptToExecute: "Guion de podcast con mención publicitaria", monetizationGoal: "$50.00", status: "Pendiente" },
+    { day: 26, platform: "Instagram", actionType: "Reel Viral", title: "Top 5 páginas que pagan por contenido", promptToExecute: "Listicle de alta viralidad para guardar y compartir", monetizationGoal: "$95.00", status: "Pendiente" },
+    { day: 27, platform: "Shopify", actionType: "Descuento Fin de Mes", title: "Campaña 'Últimos 3 días del mes'", promptToExecute: "Secuencia de urgencia extrema", monetizationGoal: "$200.00", status: "Pendiente" },
+    { day: 28, platform: "Binance", actionType: "Afiliados Cripto", title: "Tutorial de staking y recompensas pasivas", promptToExecute: "Guía con enlace de referido de Binance", monetizationGoal: "$115.00", status: "Pendiente" },
+    { day: 29, platform: "YouTube", actionType: "Resumen Mensual", title: "Video: Cuánto dinero gané este mes con IA", promptToExecute: "Desglose transparente con enlaces a herramientas", monetizationGoal: "$175.00", status: "Pendiente" },
+    { day: 30, platform: "Cross-Platform", actionType: "Re-distribución Bucle", title: "Reciclar los 5 contenidos más rentables y automatizar", promptToExecute: "Plan de re-optimización para el siguiente ciclo", monetizationGoal: "$220.00", status: "Pendiente" }
+  ]
+};
+
+export const INITIAL_DISTRIBUTION_JOBS: DistributionJob[] = [
+  {
+    id: "job_1",
+    contentId: "cnt_1",
+    title: "Campaña Automatizada: Pack de Prompts de Monetización",
+    platforms: ["youtube", "tiktok", "instagram", "pinterest", "shopify"],
+    frequency: "loop_continuous",
+    isLoopActive: true,
+    cyclesCompleted: 24,
+    totalRevenueGenerated: 842.30,
+    lastExecution: "Hace 12 min",
+    nextExecution: "En 18 min",
+    status: "running",
+    autoMonetizeLinks: true
+  },
+  {
+    id: "job_2",
+    contentId: "cnt_2",
+    title: "Distribución de Regalías Audio & Audiobooks",
+    platforms: ["spotify", "youtube"],
+    frequency: "daily",
+    isLoopActive: true,
+    cyclesCompleted: 8,
+    totalRevenueGenerated: 310.50,
+    lastExecution: "Hoy a las 08:00 AM",
+    nextExecution: "Mañana a las 08:00 AM",
+    status: "scheduled",
+    autoMonetizeLinks: true
+  }
+];
+
+export const INITIAL_TRANSACTIONS: RevenueTransaction[] = [
+  {
+    id: "tx_101",
+    timestamp: "Hace 12 seg",
+    platform: "shopify",
+    platformName: "Shopify Store",
+    type: "Venta Producto",
+    description: "Pack Prompts Monetización 2026 (Comprador: Madrid, ES)",
+    amount: 19.99,
+    status: "completed"
+  },
+  {
+    id: "tx_102",
+    timestamp: "Hace 45 seg",
+    platform: "binance",
+    platformName: "Binance Pay",
+    type: "Binance USDT",
+    description: "Pago instantáneo Web3 (Hash: 0x48a...29b)",
+    amount: 25.00,
+    status: "completed"
+  },
+  {
+    id: "tx_103",
+    timestamp: "Hace 2 min",
+    platform: "paypal",
+    platformName: "PayPal Gateway",
+    type: "PayPal Checkout",
+    description: "Suscripción Mensual Plantillas VIP",
+    amount: 9.00,
+    status: "completed"
+  },
+  {
+    id: "tx_104",
+    timestamp: "Hace 3 min",
+    platform: "pinterest",
+    platformName: "Pinterest Afiliados",
+    type: "Comisión Afiliado",
+    description: "Clic convertido en tienda de software asociado",
+    amount: 14.50,
+    status: "completed"
+  },
+  {
+    id: "tx_105",
+    timestamp: "Hace 5 min",
+    platform: "spotify",
+    platformName: "Spotify Royalties",
+    type: "Regalías Audio",
+    description: "Liquidación por 1,200 reproducciones playlist Lo-Fi",
+    amount: 4.80,
+    status: "completed"
+  },
+  {
+    id: "tx_106",
+    timestamp: "Hace 8 min",
+    platform: "youtube",
+    platformName: "YouTube Partner",
+    type: "AdSense / Vistas",
+    description: "Ingresos por 3,400 visualizaciones de Shorts monetizados",
+    amount: 7.20,
+    status: "completed"
+  }
+];

@@ -1,0 +1,6 @@
+{
+  "name": "Pre-Asistente de Monetización e Ingresos IA",
+  "description": "Monitor inteligente de monetización multi-plataforma, verificación biométrica facial KYC, generador de prompts, planificador mensual Excel y distribuidor automatizado de contenido con motor de ingresos en tiempo real.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
