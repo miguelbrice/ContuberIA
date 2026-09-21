@@ -1,5 +1,5 @@
 import React from "react";
-import { ShieldCheck, ShieldAlert, DollarSign, RefreshCw, Zap, ArrowUpRight, User, PlusCircle, CheckCircle2, LogOut, Sliders } from "lucide-react";
+import { ShieldCheck, ShieldAlert, DollarSign, RefreshCw, Zap, ArrowUpRight, User, PlusCircle, CheckCircle2, LogOut, Sliders, HelpCircle, Globe2 } from "lucide-react";
 import { KYCData } from "../types";
 
 interface HeaderProps {
@@ -12,6 +12,7 @@ interface HeaderProps {
   onOpenPayout: () => void;
   onOpenNewAccount: () => void;
   onOpenSettings: () => void;
+  onOpenInvestorFAQ: () => void;
   hideLiveBalances?: boolean;
   selectedProfileName: string;
   onChangeProfile: (name: string) => void;
@@ -35,6 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenPayout,
   onOpenNewAccount,
   onOpenSettings,
+  onOpenInvestorFAQ,
   hideLiveBalances = false,
   selectedProfileName,
   onChangeProfile,
@@ -59,13 +61,16 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-xl text-white tracking-tight">MONETI<span className="text-[#CBFF00]">PRE</span> IA</span>
-                <span className="text-[10px] font-black bg-[#CBFF00] text-black px-2 py-0.5 rounded-full tracking-wider">
-                  v3.7 PRO
+                <span className="font-black text-xl text-white tracking-tight">CONTUBER <span className="text-[#CBFF00]">IA</span></span>
+                <span className="text-[9px] font-black bg-[#CBFF00] text-black px-2 py-0.5 rounded-full tracking-wider">
+                  PROTOTIPO 🇧🇷
+                </span>
+                <span className="hidden sm:inline text-[9px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">
+                  2027 - 2030
                 </span>
               </div>
               <p className="text-xs text-zinc-400 flex items-center gap-1.5 font-medium">
-                <span>Pre-asistente de Monetización & Ventas</span>
+                <span>Made in Brazil • Fase Promocional</span>
                 {isLoopActive && (
                   <span className="inline-flex items-center gap-1 text-[10px] text-[#CBFF00] bg-zinc-900 border border-[#CBFF00]/40 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
                     <RefreshCw className="w-2.5 h-2.5 animate-spin" /> Bucle Activo
@@ -134,7 +139,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* User Account, KYC Badge, Settings & Quick Multi-Account Switcher */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2.5">
+          {/* Investor & FAQ Modal Trigger */}
+          <button
+            onClick={onOpenInvestorFAQ}
+            title="Dossier Inversionistas, FAQ y Modelo de Negocio (2027-2030)"
+            className="px-2.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-[#CBFF00]/40 text-[#CBFF00] hover:border-[#CBFF00] transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold shadow-lg shadow-[#CBFF00]/5"
+          >
+            <HelpCircle className="w-4 h-4 text-[#CBFF00]" />
+            <span className="text-[11px] uppercase tracking-wider font-black">DOSSIER / FAQ</span>
+          </button>
+
           {/* Settings Trigger (FE-4) */}
           <button
             onClick={onOpenSettings}

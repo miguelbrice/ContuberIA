@@ -99,8 +99,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   // FE-4.4.3: Regeneración de API Keys
   const handleRegenerateKeys = () => {
-    const newPub = "pk_monetipre_" + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
-    const newSec = "sec_monetipre_" + Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16);
+    const newPub = "pk_contuber_" + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+    const newSec = "sec_contuber_" + Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16);
 
     onUpdateSettings({
       ...settings,

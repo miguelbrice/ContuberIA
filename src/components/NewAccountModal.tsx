@@ -114,7 +114,7 @@ export const NewAccountModal: React.FC<NewAccountModalProps> = ({
   const [handle, setHandle] = useState("");
   const [followers, setFollowers] = useState("5000");
   const [payoutMethod, setPayoutMethod] = useState("PayPal / Transferencia");
-  const [payoutAddress, setPayoutAddress] = useState("creador.demo@monetipre.io");
+  const [payoutAddress, setPayoutAddress] = useState("creador.demo@contuber.io");
 
   if (!isOpen) return null;
 
@@ -171,7 +171,7 @@ export const NewAccountModal: React.FC<NewAccountModalProps> = ({
             metricValue: `OAuth2 OK • ${data.account?.liveStatus || "ONLINE"} (${data.account?.viewerCount || 340} viewers)`,
             monetizationStatus: "Aprobado / Activo",
             payoutMethod: "Dispersión Automática 24/7",
-            payoutAddress: "creador.demo@monetipre.io",
+            payoutAddress: "creador.demo@contuber.io",
             lastSync: "Recién sincronizado con API",
             category: selectedProvider.category,
             badgeColor: selectedProvider.color,

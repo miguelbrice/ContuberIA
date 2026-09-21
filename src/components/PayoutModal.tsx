@@ -19,7 +19,7 @@ interface PayoutModalProps {
   onClose: () => void;
   availableBalance: number;
   kyc: KYCData;
-  onConfirmPayout: (amount: number, method: string) => void;
+  onConfirmPayout: (amount: number, method: string, concept?: string) => void;
 }
 
 export const PayoutModal: React.FC<PayoutModalProps> = ({
@@ -34,6 +34,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
   const [destination, setDestination] = useState(
     method === "paypal" ? "paypal@creadordigital.com" : (method === "binance" ? "TX9K83910482019481" : "ES48 0000 0000 0000 0000")
   );
+  const [concept, setConcept] = useState("Servicios de Publicidad Digital & Streaming");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [rollbackError, setRollbackError] = useState<string | null>(null);
@@ -56,6 +57,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
           amount: parsedAmount,
           method,
           destination,
+          concept,
           simulateFailure
         })
       });
@@ -79,7 +81,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
         origin: { y: 0.6 }
       });
 
-      onConfirmPayout(parsedAmount, method);
+      onConfirmPayout(parsedAmount, method, concept);
     } catch (err: any) {
       setIsProcessing(false);
       setRollbackError("Error de comunicación de red. Estado mantenido sin cambios.");
@@ -206,6 +208,39 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                 onChange={(e) => setDestination(e.target.value)}
                 className="w-full bg-black border border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-100 focus:outline-none focus:border-[#CBFF00]"
               />
+            </div>
+
+            {/* Transaction Concept (Scenario 2: Avaliación) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-black uppercase tracking-wider text-zinc-400">Concepto de la Transacción</label>
+                <span className="text-[10px] font-mono text-[#CBFF00] bg-zinc-950 px-1.5 py-0.2 rounded border border-[#CBFF00]/30 font-bold">
+                  Avaliación 2027-2030
+                </span>
+              </div>
+              <input
+                type="text"
+                required
+                value={concept}
+                onChange={(e) => setConcept(e.target.value)}
+                placeholder="ej. Honorarios por Publicidad, Regalías Streaming"
+                className="w-full bg-black border border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 focus:outline-none focus:border-[#CBFF00]"
+              />
+              <p className="text-[10px] text-zinc-400 mt-1">
+                En producción las transacciones deben especificar un concepto y entrar en avaliación antifraude.
+              </p>
+            </div>
+
+            {/* Prototype Notice & Roadmap Schedule */}
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-[11px] text-zinc-300 space-y-1">
+              <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                <span>Escenario Fintech (2027 - 2030)</span>
+              </div>
+              <p className="text-zinc-400 text-[10px] leading-relaxed">
+                En este prototipo promocional la dispersión es instantánea con <strong>USD ficticios</strong>. 
+                En producción total, el dinero se retira en un promedio de <strong>4 a 15 días hábiles</strong> sujeto a fechas límites quincenales.
+              </p>
             </div>
 
             {/* KYC Clearance badge */}

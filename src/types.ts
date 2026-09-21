@@ -145,7 +145,7 @@ export interface RevenueTransaction {
   timestamp: string;
   platform: PlatformKey;
   platformName: string;
-  type: "Venta Producto" | "Regalías Audio" | "Comisión Afiliado" | "AdSense / Vistas" | "Binance USDT" | "PayPal Checkout";
+  type: "Venta Producto" | "Regalías Audio" | "Comisión Afiliado" | "AdSense / Vistas" | "Binance USDT" | "PayPal Checkout" | "Banco Directo";
   description: string;
   amount: number;
   status: "completed" | "processing";

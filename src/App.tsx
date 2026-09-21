@@ -48,13 +48,14 @@ import { NewAccountModal } from "./components/NewAccountModal";
 import { PayoutModal } from "./components/PayoutModal";
 import { AIChannelAuditor } from "./components/AIChannelAuditor";
 import { SettingsModal } from "./components/SettingsModal";
+import { InvestorFAQModal } from "./components/InvestorFAQModal";
 import { LoginScreen, UserSession } from "./components/LoginScreen";
 
 export default function App() {
   // Authentication & Session State (Scenario 1, 2, 3)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
-      const saved = localStorage.getItem("monetipre_session");
+      const saved = localStorage.getItem("contuber_session") || localStorage.getItem("monetipre_session");
       return !!saved;
     } catch {
       return false;
@@ -63,7 +64,7 @@ export default function App() {
 
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => {
     try {
-      const saved = localStorage.getItem("monetipre_session");
+      const saved = localStorage.getItem("contuber_session") || localStorage.getItem("monetipre_session");
       if (saved) return JSON.parse(saved);
     } catch {
       // ignore
@@ -103,6 +104,7 @@ export default function App() {
   const [isNewAccountModalOpen, setIsNewAccountModalOpen] = useState(false);
   const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isInvestorModalOpen, setIsInvestorModalOpen] = useState(false);
   const [auditAccount, setAuditAccount] = useState<PlatformAccount | null>(null);
 
   // User Settings State (FE-4: Privacidad, IA, KYC, ID)
@@ -123,12 +125,12 @@ export default function App() {
         autoSubmitToTaxAuthority: false
       },
       identity: {
-        terminalId: "TERM-2026-X890-ALPHA",
-        taxId: "ES-B00000000",
-        legalEntityName: "MonetiPre Media S.L.",
-        apiKeyPublic: "pk_demo_monetipre_98319a28",
-        apiKeySecret: "sec_demo_monetipre_f8910a247192049",
-        lastRegenerated: "2026-09-20"
+        terminalId: "TERM-2026-BR-ALPHA",
+        taxId: "BR-00000000000100",
+        legalEntityName: "Contuber Brasil Media Tech Ltda.",
+        apiKeyPublic: "pk_demo_contuber_98319a28",
+        apiKeySecret: "sec_demo_contuber_f8910a247192049",
+        lastRegenerated: "2026-09-21"
       }
     };
   });
@@ -147,6 +149,7 @@ export default function App() {
 
   const handleLogout = () => {
     try {
+      localStorage.removeItem("contuber_session");
       localStorage.removeItem("monetipre_session");
     } catch {
       // ignore
@@ -267,7 +270,7 @@ export default function App() {
     setActiveTab("distribution");
   };
 
-  const handleConfirmPayout = (amount: number, method: string) => {
+  const handleConfirmPayout = (amount: number, method: string, concept?: string) => {
     setCurrentRevenue((prev) => Math.max(0, prev - amount));
     
     // Add transaction
@@ -275,9 +278,11 @@ export default function App() {
       id: "payout_" + Date.now(),
       timestamp: "Ahora mismo",
       platform: method === "binance" ? "binance" : "paypal",
-      platformName: method === "binance" ? "Binance USDT Payout" : "PayPal Instant Payout",
-      type: method === "binance" ? "Binance USDT" : "PayPal Checkout",
-      description: `Retiro exitoso de fondos a tu cuenta (${method.toUpperCase()})`,
+      platformName: method === "binance" ? "Binance USDT Payout" : (method === "bank" ? "Transferencia Bancaria" : "PayPal Instant Payout"),
+      type: method === "binance" ? "Binance USDT" : (method === "bank" ? "Banco Directo" : "PayPal Checkout"),
+      description: concept 
+        ? `Retiro: ${concept} (${method.toUpperCase()})` 
+        : `Retiro exitoso de fondos a tu cuenta (${method.toUpperCase()})`,
       amount: amount,
       status: "completed"
     };
@@ -304,6 +309,7 @@ export default function App() {
         onOpenPayout={() => setIsPayoutModalOpen(true)}
         onOpenNewAccount={() => setIsNewAccountModalOpen(true)}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
+        onOpenInvestorFAQ={() => setIsInvestorModalOpen(true)}
         hideLiveBalances={userSettings.privacy.hideLiveBalances}
         selectedProfileName={selectedProfileName}
         onChangeProfile={setSelectedProfileName}
@@ -507,12 +513,60 @@ export default function App() {
         userEmail={currentUser?.email || ""}
       />
 
+      <InvestorFAQModal
+        isOpen={isInvestorModalOpen}
+        onClose={() => setIsInvestorModalOpen(false)}
+      />
+
       {/* Footer */}
-      <footer className="mt-auto border-t border-zinc-900 bg-black py-5 px-4 text-center text-xs text-zinc-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-bold tracking-tight text-zinc-400">© 2026 MONETIPRE IA • SISTEMA DE MONETIZACIÓN AUTOMATIZADO</p>
-          <div className="flex items-center gap-3 text-[11px] font-mono font-semibold text-zinc-400">
-            <span>YOUTUBE</span> • <span>SPOTIFY</span> • <span>PINTEREST</span> • <span>TIKTOK</span> • <span>SHOPIFY</span> • <span>PAYPAL</span> • <span>BINANCE</span>
+      <footer className="mt-auto border-t border-zinc-900 bg-black py-6 px-4 text-xs text-zinc-400">
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-zinc-900 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-lg bg-[#CBFF00] p-0.5 flex items-center justify-center">
+                <span className="font-black text-black text-xs">CT</span>
+              </div>
+              <div>
+                <p className="font-black tracking-tight text-white flex items-center gap-2">
+                  <span>CONTUBER IA</span>
+                  <span className="text-[9px] bg-[#CBFF00] text-black px-1.5 py-0.2 rounded font-mono font-bold">MADE IN BRAZIL 🇧🇷</span>
+                  <span className="text-[10px] text-zinc-400 font-mono">Startup Prototipo Promocional</span>
+                </p>
+                <p className="text-[11px] text-zinc-400">
+                  Estado fase: Promocional • Funcionalidad total bancaria estimada: <strong>PROXIMAMENTE 2027 - 2030</strong>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsInvestorModalOpen(true)}
+                className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-[#CBFF00] hover:text-black border border-[#CBFF00]/40 text-[#CBFF00] text-xs font-bold transition-colors cursor-pointer"
+              >
+                Abrir Dossier de Inversión & FAQ
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[11px] text-zinc-400">
+            <p className="max-w-2xl leading-relaxed">
+              <strong>Declaración de Términos:</strong> Los balances en USD, depósitos y comisiones mostradas son ficticios y simulados sin valor monetario real. 
+              La plataforma no provee canales de soporte especializado ficticios.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 text-zinc-400 font-medium">
+              <a href="https://www.instagram.com/f.e.m.m.n.a" target="_blank" rel="noreferrer" className="hover:text-[#CBFF00] underline">
+                Legal: @f.e.m.m.n.a
+              </a>
+              <span>•</span>
+              <a href="https://web-adversity.vercel.app" target="_blank" rel="noreferrer" className="hover:text-[#CBFF00] underline">
+                Dev: Adsversity
+              </a>
+              <span>•</span>
+              <a href="https://github.com/miguelbrice/ContuberIA" target="_blank" rel="noreferrer" className="hover:text-[#CBFF00] underline">
+                Repo: ContuberIA
+              </a>
+            </div>
           </div>
         </div>
       </footer>

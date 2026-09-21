@@ -40,7 +40,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const [viewMode, setViewMode] = useState<"login" | "register" | "forgot">("login");
 
   // Form Fields
-  const [identifier, setIdentifier] = useState("creador.demo@monetipre.io");
+  const [identifier, setIdentifier] = useState("creador.demo@contuber.io");
   const [pin, setPin] = useState("2026");
   const [profileName, setProfileName] = useState("Perfil Principal: Creador Pro");
   const [showPin, setShowPin] = useState(false);
@@ -163,15 +163,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           profileName: userProfile,
           kycLevel: "Nivel 3 (Biometría Facial Aprobada 99.4%)",
           authenticatedAt: new Date().toLocaleTimeString(),
-          terminalId: data.user?.terminalId || "TERM-MONETI-77X",
-          taxId: data.user?.taxId || "ES-48920194K"
+          terminalId: data.user?.terminalId || "TERM-CONTUBER-77X",
+          taxId: data.user?.taxId || "BR-00000000000100"
         };
 
         if (rememberMe) {
           try {
+            localStorage.setItem("contuber_session", JSON.stringify(session));
             localStorage.setItem("monetipre_session", JSON.stringify(session));
             if (data.tokens) {
-              localStorage.setItem("monetipre_tokens", JSON.stringify(data.tokens));
+              localStorage.setItem("contuber_tokens", JSON.stringify(data.tokens));
             }
           } catch (e) {
             console.warn("Storage not available");
@@ -296,18 +297,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-black text-xl text-white tracking-tight">MONETI<span className="text-[#CBFF00]">PRE</span> IA</span>
-              <span className="text-[10px] font-black bg-[#CBFF00] text-black px-2 py-0.5 rounded-full tracking-wider uppercase">
-                v3.7 PRO
+              <span className="font-black text-xl text-white tracking-tight">CONTUBER <span className="text-[#CBFF00]">IA</span></span>
+              <span className="text-[9px] font-black bg-[#CBFF00] text-black px-2 py-0.5 rounded-full tracking-wider uppercase">
+                PROTOTIPO 🇧🇷
+              </span>
+              <span className="text-[9px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">
+                2027 - 2030
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400 font-medium">Terminal Central de Monetización & Control de Ingresos</p>
+            <p className="text-[11px] text-zinc-400 font-medium">Startup Prototipo Promocional • Made in Brazil</p>
           </div>
         </div>
 
         <div className="hidden sm:flex items-center gap-2 bg-zinc-950 border border-zinc-800/80 px-3 py-1.5 rounded-xl text-xs text-zinc-400 font-medium">
           <ShieldCheck className="w-4 h-4 text-[#CBFF00] stroke-[2.5]" />
-          <span>Acceso Seguro Encriptado (TLS 1.3 / JWT)</span>
+          <span>Acceso Creadores (LGPD Brasil / TLS 1.3)</span>
         </div>
       </header>
 
@@ -400,7 +404,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                       required
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
-                      placeholder="creador.demo@monetipre.io o usuario"
+                      placeholder="creador.demo@contuber.io o usuario"
                       className="w-full bg-black border border-zinc-800 rounded-xl pl-10 pr-3.5 py-3 text-xs font-medium text-white focus:outline-none focus:border-[#CBFF00] transition-colors"
                     />
                   </div>
@@ -499,7 +503,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                     type="button"
                     onClick={() => handleQuickLogin({
                       name: "Creador Demo",
-                      email: "creador.demo@monetipre.io",
+                      email: "creador.demo@contuber.io",
                       profile: "Perfil Principal: Creador Pro",
                       role: "Propietario KYC Verificado",
                       pin: "2026"
@@ -518,7 +522,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                     type="button"
                     onClick={() => handleQuickLogin({
                       name: "Operador de Medios",
-                      email: "operador@monetipre.io",
+                      email: "operador@contuber.io",
                       profile: "Tienda E-Com & Afiliados",
                       role: "Operador de Tráfico",
                       pin: "2026"
@@ -727,10 +731,27 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       </main>
 
       {/* Bottom Footer */}
-      <footer className="max-w-6xl w-full mx-auto py-3 text-center border-t border-zinc-900">
-        <p className="text-xs text-zinc-500">
-          MONETIPRE IA &copy; 2026 • Terminal Central de Monetización Multi-Streaming & Protocolos Financieros
+      <footer className="max-w-6xl w-full mx-auto py-5 text-center border-t border-zinc-900 space-y-2">
+        <p className="text-xs text-zinc-400 font-bold">
+          CONTUBER IA &copy; 2026 • Startup Prototipo Promocional • Made in Brazil 🇧🇷
         </p>
+        <p className="text-[11px] text-zinc-500 max-w-2xl mx-auto leading-relaxed">
+          <strong>Declaración de Términos:</strong> Los balances y transacciones mostradas corresponden a USD ficticios sin valor comercial real. 
+          Despliegue de funcionalidad bancaria total proyectado para 2027 - 2030. Sin soporte especializado ficticio.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-zinc-400 pt-1">
+          <a href="https://www.instagram.com/f.e.m.m.n.a" target="_blank" rel="noreferrer" className="hover:text-[#CBFF00] underline">
+            Representación Legal: @f.e.m.m.n.a
+          </a>
+          <span>•</span>
+          <a href="https://web-adversity.vercel.app" target="_blank" rel="noreferrer" className="hover:text-[#CBFF00] underline">
+            Desarrollador: Adsversity
+          </a>
+          <span>•</span>
+          <a href="https://github.com/miguelbrice/ContuberIA" target="_blank" rel="noreferrer" className="hover:text-[#CBFF00] underline">
+            GitHub: ContuberIA
+          </a>
+        </div>
       </footer>
 
     </div>

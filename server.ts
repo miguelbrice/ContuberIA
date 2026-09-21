@@ -403,16 +403,29 @@ app.post("/api/kyc/verify", (req, res) => {
 
 // In-Memory Database for Users & Streams (Scenarios DB-1, DB-2, BE-AUTH-1, BE-AUTH-2)
 const registeredUsers: Record<string, any> = {
-  "creador.demo@monetipre.io": {
+  "creador.demo@contuber.io": {
     uid: "usr_creator_01",
     fullName: "Creador Demo",
-    email: "creador.demo@monetipre.io",
+    email: "creador.demo@contuber.io",
     passwordHash: "2026", // demo password
     role: "creator_owner", // BE-AUTH-2: RBAC
     failedAttempts: 0, // FE-1.5: Lockout tracker
     lockUntil: null,
-    taxId: "ES-X0000000X",
-    terminalId: "TERM-DEMO-8X94",
+    taxId: "BR-00000000000100",
+    terminalId: "TERM-DEMO-BR-8X94",
+    balance: 1428.94,
+    createdAt: new Date().toISOString()
+  },
+  "creador.demo@monetipre.io": {
+    uid: "usr_creator_01",
+    fullName: "Creador Demo",
+    email: "creador.demo@contuber.io",
+    passwordHash: "2026", // demo password
+    role: "creator_owner",
+    failedAttempts: 0,
+    lockUntil: null,
+    taxId: "BR-00000000000100",
+    terminalId: "TERM-DEMO-BR-8X94",
     balance: 1428.94,
     createdAt: new Date().toISOString()
   }
@@ -466,7 +479,7 @@ app.post("/api/auth/login", (req, res) => {
     email: user.email,
     role: user.role,
     exp: Date.now() + 1000 * 60 * 15 // 15 mins
-  })).toString("base64") + ".monetipre_sig";
+  })).toString("base64") + ".contuber_sig";
 
   const refreshToken = "rt_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
 
@@ -599,7 +612,7 @@ app.post("/api/transactions/process", (req, res) => {
     });
   }
 
-  const user = registeredUsers[userEmail || "creador.demo@monetipre.io"];
+  const user = registeredUsers[userEmail || "creador.demo@contuber.io"] || registeredUsers["creador.demo@monetipre.io"];
   if (user) {
     user.balance = +(user.balance + (amount || 0)).toFixed(2);
   }
