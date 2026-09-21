@@ -401,6 +401,217 @@ app.post("/api/kyc/verify", (req, res) => {
   });
 });
 
+// In-Memory Database for Users & Streams (Scenarios DB-1, DB-2, BE-AUTH-1, BE-AUTH-2)
+const registeredUsers: Record<string, any> = {
+  "creador.demo@monetipre.io": {
+    uid: "usr_creator_01",
+    fullName: "Creador Demo",
+    email: "creador.demo@monetipre.io",
+    passwordHash: "2026", // demo password
+    role: "creator_owner", // BE-AUTH-2: RBAC
+    failedAttempts: 0, // FE-1.5: Lockout tracker
+    lockUntil: null,
+    taxId: "ES-X0000000X",
+    terminalId: "TERM-DEMO-8X94",
+    balance: 1428.94,
+    createdAt: new Date().toISOString()
+  }
+};
+
+// BE-AUTH-1 & FE-1: Login Endpoint with Attempt Limiting & JWT/Tokens
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email y contraseña requeridos (FE-1.3)" });
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+  const user = registeredUsers[normalizedEmail];
+
+  // FE-1.5: Bloqueo por intentos fallidos
+  if (user && user.lockUntil && Date.now() < user.lockUntil) {
+    const remainingSec = Math.ceil((user.lockUntil - Date.now()) / 1000);
+    return res.status(429).json({ 
+      error: `Cuenta temporalmente bloqueada por exceso de intentos erróneos. Espera ${remainingSec}s. (FE-1.5)`,
+      lockout: true,
+      remainingSec
+    });
+  }
+
+  // FE-1.2: Credenciales inválidas genéricas
+  if (!user || user.passwordHash !== password) {
+    if (user) {
+      user.failedAttempts = (user.failedAttempts || 0) + 1;
+      if (user.failedAttempts >= 5) {
+        user.lockUntil = Date.now() + 60000; // 1 minute lockout
+        user.failedAttempts = 0;
+        return res.status(429).json({ 
+          error: "Has superado el límite de 5 intentos. Cuenta bloqueada por 60 segundos por seguridad. (FE-1.5)",
+          lockout: true,
+          remainingSec: 60
+        });
+      }
+    }
+    return res.status(401).json({ error: "Credenciales inválidas. Comprueba tu usuario y contraseña. (FE-1.2)" });
+  }
+
+  // Reset failed attempts on success
+  user.failedAttempts = 0;
+  user.lockUntil = null;
+
+  // BE-AUTH-1: Issue AccessToken & RefreshToken
+  const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." + Buffer.from(JSON.stringify({
+    uid: user.uid,
+    email: user.email,
+    role: user.role,
+    exp: Date.now() + 1000 * 60 * 15 // 15 mins
+  })).toString("base64") + ".monetipre_sig";
+
+  const refreshToken = "rt_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+  return res.json({
+    success: true,
+    user: {
+      uid: user.uid,
+      name: user.fullName,
+      email: user.email,
+      role: user.role,
+      terminalId: user.terminalId,
+      taxId: user.taxId,
+      balance: user.balance
+    },
+    tokens: {
+      accessToken,
+      refreshToken,
+      expiresIn: 900
+    }
+  });
+});
+
+// FE-2: Creación de Usuario / Registro
+app.post("/api/auth/register", (req, res) => {
+  const { fullName, email, password, termsAccepted } = req.body;
+
+  // FE-2.4: Aceptación obligatoria de términos
+  if (!termsAccepted) {
+    return res.status(400).json({ error: "Debes aceptar los Términos y la Política de Monetización (FE-2.4)" });
+  }
+
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios (FE-2.1)" });
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // FE-2.2: Registro con correo duplicado
+  if (registeredUsers[normalizedEmail]) {
+    return res.status(409).json({ 
+      error: "Este correo electrónico ya está registrado en la Terminal. Inicia sesión en su lugar. (FE-2.2)",
+      duplicate: true
+    });
+  }
+
+  // FE-2.3: Validación de fortaleza de contraseña (min 8 chars, 1 number or special)
+  if (password.length < 8) {
+    return res.status(400).json({ error: "La contraseña es muy débil. Debe tener al menos 8 caracteres (FE-2.3)" });
+  }
+
+  const newUid = "usr_" + Math.random().toString(36).substring(2, 9);
+  const newUser = {
+    uid: newUid,
+    fullName,
+    email: normalizedEmail,
+    passwordHash: password,
+    role: "creator_standard",
+    failedAttempts: 0,
+    lockUntil: null,
+    taxId: "PENDIENTE",
+    terminalId: "TERM-" + Math.random().toString(36).substring(2, 8).toUpperCase(),
+    balance: 0.00,
+    createdAt: new Date().toISOString()
+  };
+
+  registeredUsers[normalizedEmail] = newUser;
+
+  return res.status(201).json({
+    success: true,
+    message: "Cuenta creada exitosamente. Se ha emitido tu identificador de terminal (FE-2.1).",
+    user: {
+      uid: newUser.uid,
+      name: newUser.fullName,
+      email: newUser.email,
+      role: newUser.role,
+      terminalId: newUser.terminalId
+    }
+  });
+});
+
+// FE-1.4: Recuperación de Contraseña
+app.post("/api/auth/forgot-password", (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "Ingresa tu correo registrado (FE-1.4)" });
+  }
+  // Secure response (always return success to prevent email enumeration)
+  return res.json({
+    success: true,
+    message: `Si la cuenta existe, se ha enviado un enlace de restablecimiento seguro a ${email} (FE-1.4).`
+  });
+});
+
+// FE-3: Vinculación OAuth2 de Streams (Twitch, YouTube, Kick, etc.)
+app.post("/api/stream/oauth-connect", (req, res) => {
+  const { provider, channelHandle } = req.body;
+
+  if (!provider) {
+    return res.status(400).json({ error: "Proveedor de streaming no especificado" });
+  }
+
+  // Simulate OAuth2 verification exchange
+  const verifiedAccount = {
+    provider,
+    channelId: "chn_" + provider + "_" + Math.random().toString(36).substring(2, 8),
+    channelName: channelHandle || `${provider.toUpperCase()} Oficial`,
+    verified: true,
+    liveStatus: Math.random() > 0.4 ? "LIVE" : "OFFLINE",
+    viewerCount: Math.floor(Math.random() * 850 + 50),
+    syncedAt: new Date().toISOString(),
+    projectedRpm: (Math.random() * 3 + 1.2).toFixed(2)
+  };
+
+  res.json({
+    success: true,
+    message: `Cuenta de ${provider.toUpperCase()} conectada y verificada mediante OAuth2 (FE-3.1).`,
+    account: verifiedAccount
+  });
+});
+
+// DB-2: Transacción Financiera Segura con Simulación de Rollback/Commit
+app.post("/api/transactions/process", (req, res) => {
+  const { userEmail, amount, type, shouldSimulateFailure } = req.body;
+
+  // DB-2: Integridad referencial & rollback
+  if (shouldSimulateFailure) {
+    return res.status(500).json({
+      error: "Rollback automático: Error de conexión durante la liquidación bancaria. El balance del usuario no fue alterado (DB-2).",
+      rolledBack: true
+    });
+  }
+
+  const user = registeredUsers[userEmail || "creador.demo@monetipre.io"];
+  if (user) {
+    user.balance = +(user.balance + (amount || 0)).toFixed(2);
+  }
+
+  res.json({
+    success: true,
+    committed: true,
+    newBalance: user ? user.balance : amount,
+    txnId: "tx_" + Date.now()
+  });
+});
+
 async function startServer() {
   // Vite middleware in development
   if (process.env.NODE_ENV !== "production") {

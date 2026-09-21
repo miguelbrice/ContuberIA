@@ -33,7 +33,8 @@ import {
   DistributionJob, 
   RevenueTransaction,
   GeneratedContent,
-  PlatformKey 
+  PlatformKey,
+  UserSettings
 } from "./types";
 
 import { Header } from "./components/Header";
@@ -46,6 +47,7 @@ import { KYCBiometricModal } from "./components/KYCBiometricModal";
 import { NewAccountModal } from "./components/NewAccountModal";
 import { PayoutModal } from "./components/PayoutModal";
 import { AIChannelAuditor } from "./components/AIChannelAuditor";
+import { SettingsModal } from "./components/SettingsModal";
 import { LoginScreen, UserSession } from "./components/LoginScreen";
 
 export default function App() {
@@ -90,7 +92,7 @@ export default function App() {
   const [isGlobalLoopActive, setIsGlobalLoopActive] = useState<boolean>(true);
 
   // Active creator profile
-  const [selectedProfileName, setSelectedProfileName] = useState("Perfil Principal: Miguel A.");
+  const [selectedProfileName, setSelectedProfileName] = useState("Perfil Principal: Creador Pro");
 
   // Transfer State between modules
   const [contentStudioTopic, setContentStudioTopic] = useState("Pack de Plantillas de Monetización con IA");
@@ -100,13 +102,42 @@ export default function App() {
   const [isKYCModalOpen, setIsKYCModalOpen] = useState(false);
   const [isNewAccountModalOpen, setIsNewAccountModalOpen] = useState(false);
   const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [auditAccount, setAuditAccount] = useState<PlatformAccount | null>(null);
+
+  // User Settings State (FE-4: Privacidad, IA, KYC, ID)
+  const [userSettings, setUserSettings] = useState<UserSettings>(() => {
+    return {
+      privacy: {
+        hideLiveBalances: false,
+        exportRequested: false,
+        allowTelemetryAnalytics: true
+      },
+      ai: {
+        defaultModel: "gemini-3.8-flash",
+        alertSensitivity: "alta",
+        autoCategorizeTransactions: true
+      },
+      kyc: {
+        requireBiometricsOnPayout: true,
+        autoSubmitToTaxAuthority: false
+      },
+      identity: {
+        terminalId: "TERM-2026-X890-ALPHA",
+        taxId: "ES-B00000000",
+        legalEntityName: "MonetiPre Media S.L.",
+        apiKeyPublic: "pk_demo_monetipre_98319a28",
+        apiKeySecret: "sec_demo_monetipre_f8910a247192049",
+        lastRegenerated: "2026-09-20"
+      }
+    };
+  });
 
   // Scenario 3 & 4: User identifies -> Platform starts the monitor
   const handleLoginSuccess = (session: UserSession) => {
     setCurrentUser(session);
     setIsAuthenticated(true);
-    setSelectedProfileName(session.profileName || "Perfil Principal: Miguel A.");
+    setSelectedProfileName(session.profileName || "Perfil Principal: Creador Pro");
     // Activate monitor and compounding telemetry
     setIsTickerRunning(true);
     setIsGlobalLoopActive(true);
@@ -272,6 +303,8 @@ export default function App() {
         onOpenKYC={() => setIsKYCModalOpen(true)}
         onOpenPayout={() => setIsPayoutModalOpen(true)}
         onOpenNewAccount={() => setIsNewAccountModalOpen(true)}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
+        hideLiveBalances={userSettings.privacy.hideLiveBalances}
         selectedProfileName={selectedProfileName}
         onChangeProfile={setSelectedProfileName}
         isLoopActive={isGlobalLoopActive}
@@ -394,6 +427,7 @@ export default function App() {
             onOpenAudit={(acc) => setAuditAccount(acc)}
             onOpenPayout={() => setIsPayoutModalOpen(true)}
             onSimulateTransaction={handleSimulateTransaction}
+            hideLiveBalances={userSettings.privacy.hideLiveBalances}
           />
         )}
 
@@ -461,6 +495,16 @@ export default function App() {
         onClose={() => setAuditAccount(null)}
         account={auditAccount}
         ratePerSecond={ratePerSecond}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        settings={userSettings}
+        onUpdateSettings={(newSettings) => setUserSettings(newSettings)}
+        kycData={kycData}
+        onOpenKYCModal={() => setIsKYCModalOpen(true)}
+        userEmail={currentUser?.email || ""}
       />
 
       {/* Footer */}

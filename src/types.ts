@@ -149,4 +149,43 @@ export interface RevenueTransaction {
   description: string;
   amount: number;
   status: "completed" | "processing";
+  categoryTag?: "Streaming" | "Suscripción" | "Comercio" | "Regalías" | "Micro-Donación";
+}
+
+export interface UserSettings {
+  // 4.1 Privacidad
+  privacy: {
+    hideLiveBalances: boolean; // FE-4.1.1
+    allowTelemetryAnalytics: boolean; // FE-4.1.3
+    exportRequested: boolean;
+  };
+  // 4.2 IA Predeterminada
+  ai: {
+    defaultModel: "gemini-3.8-flash" | "gemini-2.5-flash" | "financial-advanced"; // FE-4.2.1
+    alertSensitivity: "baja" | "media" | "alta" | "estricta"; // FE-4.2.2
+    autoCategorizeTransactions: boolean; // FE-4.2.3
+    autoReinvestRate: number; // percentage (0 - 100)
+  };
+  // 4.4 ID (Identificación y Terminal Única)
+  identity: {
+    terminalId: string; // FE-4.4.1
+    taxId: string; // FE-4.4.2 (RFC / CIF / NIF / SSN)
+    legalEntityName: string;
+    apiKeyPublic: string; // FE-4.4.3
+    apiKeySecret: string;
+    lastRegenerated: string;
+  };
+}
+
+export interface StreamOAuthProvider {
+  id: "twitch" | "youtube" | "kick" | "tiktok" | "spotify";
+  name: string;
+  logo: string;
+  scopes: string[];
+  connected: boolean;
+  channelId?: string;
+  channelName?: string;
+  liveStatus?: "LIVE" | "OFFLINE";
+  viewerCount?: number;
+  lastSync?: string;
 }

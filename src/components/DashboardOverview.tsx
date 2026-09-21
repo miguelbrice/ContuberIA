@@ -49,6 +49,7 @@ interface DashboardOverviewProps {
   onOpenAudit: (account: PlatformAccount) => void;
   onOpenPayout: () => void;
   onSimulateTransaction?: () => void;
+  hideLiveBalances?: boolean;
 }
 
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
@@ -70,7 +71,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   onOpenDistribution,
   onOpenAudit,
   onOpenPayout,
-  onSimulateTransaction
+  onSimulateTransaction,
+  hideLiveBalances = false
 }) => {
   const perMin = ratePerSecond * 60;
   const perHour = perMin * 60;
@@ -120,9 +122,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
             <div className="flex items-baseline gap-2">
               <span className="text-4xl lg:text-6xl font-black text-white font-mono tracking-tight tabular-nums">
-                ${currentRevenue.toLocaleString("en-US", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                {hideLiveBalances 
+                  ? "••••.••••" 
+                  : `$${currentRevenue.toLocaleString("en-US", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`}
               </span>
-              <span className="text-sm font-black text-zinc-400 uppercase tracking-wider">USD GENERADOS</span>
+              <span className="text-sm font-black text-zinc-400 uppercase tracking-wider">
+                {hideLiveBalances ? "MODO STREAM OCULTO" : "USD GENERADOS"}
+              </span>
             </div>
 
             <p className="text-xs text-zinc-400 flex items-center gap-2 font-medium">

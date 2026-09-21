@@ -1,5 +1,5 @@
 import React from "react";
-import { ShieldCheck, ShieldAlert, DollarSign, RefreshCw, Zap, ArrowUpRight, User, PlusCircle, CheckCircle2, LogOut } from "lucide-react";
+import { ShieldCheck, ShieldAlert, DollarSign, RefreshCw, Zap, ArrowUpRight, User, PlusCircle, CheckCircle2, LogOut, Sliders } from "lucide-react";
 import { KYCData } from "../types";
 
 interface HeaderProps {
@@ -11,6 +11,8 @@ interface HeaderProps {
   onOpenKYC: () => void;
   onOpenPayout: () => void;
   onOpenNewAccount: () => void;
+  onOpenSettings: () => void;
+  hideLiveBalances?: boolean;
   selectedProfileName: string;
   onChangeProfile: (name: string) => void;
   isLoopActive: boolean;
@@ -18,6 +20,7 @@ interface HeaderProps {
     name: string;
     email: string;
     role: string;
+    terminalId?: string;
   } | null;
   onLogout?: () => void;
 }
@@ -31,6 +34,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenKYC,
   onOpenPayout,
   onOpenNewAccount,
+  onOpenSettings,
+  hideLiveBalances = false,
   selectedProfileName,
   onChangeProfile,
   isLoopActive,
@@ -105,9 +110,16 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-baseline gap-1.5 font-mono">
                 <span className="text-xs text-[#CBFF00] font-black">$</span>
                 <span className="text-xl md:text-2xl font-black text-white tracking-tight tabular-nums">
-                  {currentRevenue.toLocaleString("en-US", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                  {hideLiveBalances 
+                    ? "••••.••••" 
+                    : currentRevenue.toLocaleString("en-US", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
                 </span>
                 <span className="text-[10px] text-zinc-400 font-sans font-bold">USD</span>
+                {hideLiveBalances && (
+                  <span className="text-[9px] bg-zinc-800 text-[#CBFF00] px-1.5 py-0.5 rounded font-sans uppercase">
+                    STREAM OCULTO
+                  </span>
+                )}
               </div>
             </div>
 
@@ -121,8 +133,17 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* User Account, KYC Badge & Quick Multi-Account Switcher */}
+        {/* User Account, KYC Badge, Settings & Quick Multi-Account Switcher */}
         <div className="hidden md:flex items-center gap-3">
+          {/* Settings Trigger (FE-4) */}
+          <button
+            onClick={onOpenSettings}
+            title="Configuración de Terminal (FE-4: Privacidad, IA, KYC, ID)"
+            className="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#CBFF00]/50 text-zinc-300 hover:text-[#CBFF00] transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+          >
+            <Sliders className="w-4 h-4" />
+            <span className="hidden xl:inline text-[11px] uppercase tracking-wider font-black">AJUSTES FE-4</span>
+          </button>
           {/* KYC Status Pill */}
           <button
             onClick={onOpenKYC}
@@ -153,7 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
               onChange={(e) => onChangeProfile(e.target.value)}
               className="bg-transparent border-none text-zinc-200 focus:outline-none cursor-pointer font-bold text-xs pr-1"
             >
-              <option value="Perfil Principal: Miguel A." className="bg-zinc-950 text-zinc-200">Perfil Principal: Miguel A.</option>
+              <option value="Perfil Principal: Creador Pro" className="bg-zinc-950 text-zinc-200">Perfil Principal: Creador Pro</option>
               <option value="Canal Tech & AI Secundario" className="bg-zinc-950 text-zinc-200">Canal Tech & IA (Sub-cuenta)</option>
               <option value="Tienda E-Com & Afiliados" className="bg-zinc-950 text-zinc-200">Tienda E-Commerce Global</option>
             </select>

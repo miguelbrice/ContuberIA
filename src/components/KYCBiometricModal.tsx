@@ -21,8 +21,8 @@ export const KYCBiometricModal: React.FC<KYCBiometricModalProps> = ({
 
   // ID Form State
   const [docType, setDocType] = useState(kycData.documentType);
-  const [docNum, setDocNum] = useState(kycData.documentNumber || "48920194-K");
-  const [fullName, setFullName] = useState(kycData.fullName || "Miguel A. Rodriguez");
+  const [docNum, setDocNum] = useState(kycData.documentNumber || "00000000-X");
+  const [fullName, setFullName] = useState(kycData.fullName || "Demo Creator Verificado");
   const [country, setCountry] = useState(kycData.country || "España / Global");
   const [idFileUploaded, setIdFileUploaded] = useState<string | null>(null);
 

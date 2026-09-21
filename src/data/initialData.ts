@@ -170,8 +170,8 @@ export const INITIAL_ACCOUNTS: PlatformAccount[] = [
 export const INITIAL_KYC: KYCData = {
   isVerified: true,
   documentType: "DNI",
-  documentNumber: "48920194-K",
-  fullName: "Miguel A. Rodriguez",
+  documentNumber: "00000000-X",
+  fullName: "Demo Creator Verificado",
   country: "España / Global",
   birthDate: "1994-06-14",
   biometricMatchScore: 98.4,

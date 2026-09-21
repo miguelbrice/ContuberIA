@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { X, ArrowUpRight, CheckCircle2, ShieldCheck, CreditCard, Coins, DollarSign, RefreshCw } from "lucide-react";
+import { 
+  X, 
+  ArrowUpRight, 
+  CheckCircle2, 
+  ShieldCheck, 
+  CreditCard, 
+  Coins, 
+  DollarSign, 
+  RefreshCw,
+  AlertTriangle,
+  RotateCcw
+} from "lucide-react";
 import confetti from "canvas-confetti";
 import { KYCData } from "../types";
 
@@ -21,28 +32,58 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
   const [method, setMethod] = useState<"paypal" | "binance" | "bank">("paypal");
   const [amount, setAmount] = useState<string>(Math.min(availableBalance, 250).toFixed(2));
   const [destination, setDestination] = useState(
-    method === "paypal" ? "paypal@creadordigital.com" : (method === "binance" ? "TX9K83910482019481" : "ES48 2100 4819 2910 8841")
+    method === "paypal" ? "paypal@creadordigital.com" : (method === "binance" ? "TX9K83910482019481" : "ES48 0000 0000 0000 0000")
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [rollbackError, setRollbackError] = useState<string | null>(null);
+  const [txDetails, setTxDetails] = useState<any>(null);
 
   if (!isOpen) return null;
 
-  const handleWithdraw = () => {
+  // DB-2.1 & DB-2.2: Transacciones ACID y Rollback en caso de fallo
+  const handleWithdraw = async (simulateFailure: boolean = false) => {
     setIsProcessing(true);
-    setTimeout(() => {
+    setRollbackError(null);
+
+    try {
+      const parsedAmount = parseFloat(amount) || 0;
+      
+      const res = await fetch("/api/transactions/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: parsedAmount,
+          method,
+          destination,
+          simulateFailure
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.status === "failed") {
+        // Escenario DB-2.2: Rollback atómico automático
+        setIsProcessing(false);
+        setRollbackError(data.error || "Fallo simulado: Transacción revertida a su estado original (Rollback atómico)");
+        return;
+      }
+
       setIsProcessing(false);
+      setTxDetails(data.transaction);
       setIsSuccess(true);
       
-      // Fire celebration confetti!
       confetti({
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 }
       });
 
-      onConfirmPayout(parseFloat(amount) || 0, method);
-    }, 1200);
+      onConfirmPayout(parsedAmount, method);
+    } catch (err: any) {
+      setIsProcessing(false);
+      setRollbackError("Error de comunicación de red. Estado mantenido sin cambios.");
+    }
   };
 
   return (
@@ -55,8 +96,11 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
               <ArrowUpRight className="w-4 h-4 stroke-[3]" />
             </div>
             <div>
-              <h3 className="font-black text-white text-sm uppercase tracking-tight">Retiro de Fondos Instantáneo</h3>
-              <p className="text-[11px] text-zinc-400 font-medium">Liquidación 24/7 de ingresos de monetización</p>
+              <div className="flex items-center gap-2">
+                <h3 className="font-black text-white text-sm uppercase tracking-tight">Retiro de Fondos Instantáneo</h3>
+                <span className="text-[9px] font-mono text-[#CBFF00] bg-zinc-950 px-1.5 py-0.5 rounded border border-[#CBFF00]/30">DB-2</span>
+              </div>
+              <p className="text-[11px] text-zinc-400 font-medium">Liquidación 24/7 y transacciones con consistencia ACID</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg text-zinc-400 hover:text-white cursor-pointer">
@@ -79,6 +123,18 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                 <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" /> 0% COMISIÓN
               </span>
             </div>
+
+            {/* Rollback Error Notice (DB-2.2) */}
+            {rollbackError && (
+              <div className="p-3 bg-red-500/10 border border-red-500/40 rounded-xl space-y-1 text-xs text-red-300 animate-in fade-in">
+                <p className="font-bold flex items-center gap-1.5 text-red-400">
+                  <RotateCcw className="w-4 h-4 shrink-0" />
+                  ROLLBACK EJECUTADO (Escenario DB-2.2)
+                </p>
+                <p className="text-[11px] text-zinc-300">{rollbackError}</p>
+                <p className="text-[10px] text-emerald-400 font-mono">Consistencia intacta: Saldo retenido revertido al usuario.</p>
+              </div>
+            )}
 
             {/* Method Selection */}
             <div>
@@ -108,7 +164,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
 
                 <button
                   type="button"
-                  onClick={() => { setMethod("bank"); setDestination("ES48 2100 4819 2910 8841"); }}
+                  onClick={() => { setMethod("bank"); setDestination("ES48 0000 0000 0000 0000"); }}
                   className={`p-3 rounded-xl border text-xs font-black uppercase flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                     method === "bank" ? "bg-[#CBFF00] text-black border-[#CBFF00]" : "bg-black text-zinc-400 border-zinc-800 hover:border-zinc-700"
                   }`}
@@ -158,31 +214,44 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
               <span className="font-medium">Titular KYC verificado: <strong className="text-white font-bold">{kyc.fullName}</strong></span>
             </div>
 
-            <div className="flex justify-end gap-3 pt-2">
+            {/* Actions */}
+            <div className="space-y-2 pt-2">
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2.5 rounded-xl border border-zinc-700 text-xs font-black uppercase text-zinc-300 hover:bg-zinc-800 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleWithdraw(false)}
+                  disabled={isProcessing || parseFloat(amount) <= 0}
+                  className="px-5 py-2.5 rounded-xl bg-[#CBFF00] hover:bg-[#b8e600] text-black font-black text-xs uppercase shadow-xl shadow-[#CBFF00]/20 flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
+                >
+                  {isProcessing ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>PROCESANDO ACID (DB-2.1)...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
+                      <span>CONFIRMAR RETIRO (${amount})</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Simulation button for DB-2.2 */}
               <button
                 type="button"
-                onClick={onClose}
-                className="px-4 py-2.5 rounded-xl border border-zinc-700 text-xs font-black uppercase text-zinc-300 hover:bg-zinc-800 cursor-pointer"
+                disabled={isProcessing}
+                onClick={() => handleWithdraw(true)}
+                className="w-full py-2 text-center text-xs text-zinc-500 hover:text-zinc-300 font-mono transition-colors cursor-pointer"
               >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleWithdraw}
-                disabled={isProcessing || parseFloat(amount) <= 0}
-                className="px-5 py-2.5 rounded-xl bg-[#CBFF00] hover:bg-[#b8e600] text-black font-black text-xs uppercase shadow-xl shadow-[#CBFF00]/20 flex items-center gap-2 cursor-pointer active:scale-95"
-              >
-                {isProcessing ? (
-                  <>
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>PROCESANDO...</span>
-                  </>
-                ) : (
-                  <>
-                    <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
-                    <span>CONFIRMAR RETIRO (${amount})</span>
-                  </>
-                )}
+                [Probar Escenario DB-2.2: Simular Error de Gateway & Verificar Rollback]
               </button>
             </div>
 
@@ -194,15 +263,15 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
             </div>
 
             <div>
-              <h4 className="text-base font-black text-white uppercase tracking-tight">¡Retiro Enviado con Éxito!</h4>
+              <h4 className="text-base font-black text-white uppercase tracking-tight">¡Retiro Ejecutado con Éxito! (DB-2.1)</h4>
               <p className="text-xs text-zinc-400 mt-1 font-medium">
                 Se han transferido <strong className="text-[#CBFF00] font-bold">${amount} USD</strong> a {destination}.
               </p>
             </div>
 
             <div className="bg-black p-3.5 rounded-xl border border-zinc-800 text-[11px] font-mono text-zinc-300 text-left space-y-1">
-              <p>ID Transacción: TXN-{Date.now().toString(36).toUpperCase()}</p>
-              <p>Estado: Procesado Inmediato</p>
+              <p>ID Transacción: <span className="text-[#CBFF00]">{txDetails?.id || `TXN-${Date.now().toString(36).toUpperCase()}`}</span></p>
+              <p>Estado: Consistencia Confirmada (Committed)</p>
               <p>Comisión cobrada: $0.00 USD (Beneficio KYC)</p>
             </div>
 
