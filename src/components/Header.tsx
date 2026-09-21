@@ -1,5 +1,20 @@
 import React from "react";
-import { ShieldCheck, ShieldAlert, DollarSign, RefreshCw, Zap, ArrowUpRight, User, PlusCircle, CheckCircle2, LogOut, Sliders, HelpCircle, Globe2 } from "lucide-react";
+import { 
+  ShieldCheck, 
+  ShieldAlert, 
+  DollarSign, 
+  RefreshCw, 
+  Zap, 
+  ArrowUpRight, 
+  User, 
+  PlusCircle, 
+  CheckCircle2, 
+  LogOut, 
+  Sliders, 
+  HelpCircle, 
+  Globe2,
+  Handshake
+} from "lucide-react";
 import { KYCData } from "../types";
 
 interface HeaderProps {
@@ -13,6 +28,7 @@ interface HeaderProps {
   onOpenNewAccount: () => void;
   onOpenSettings: () => void;
   onOpenInvestorFAQ: () => void;
+  onOpenPartnership?: () => void;
   hideLiveBalances?: boolean;
   selectedProfileName: string;
   onChangeProfile: (name: string) => void;
@@ -37,6 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewAccount,
   onOpenSettings,
   onOpenInvestorFAQ,
+  onOpenPartnership,
   hideLiveBalances = false,
   selectedProfileName,
   onChangeProfile,
@@ -54,10 +71,8 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand & Creator Identity */}
         <div className="flex items-center gap-3.5 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#CBFF00] p-0.5 shadow-lg shadow-[#CBFF00]/20 flex items-center justify-center">
-              <div className="w-full h-full bg-black rounded-[10px] flex items-center justify-center">
-                <Zap className="w-5 h-5 text-[#CBFF00] fill-[#CBFF00]/20 animate-pulse" />
-              </div>
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-[#CBFF00]/50 p-1 shadow-lg shadow-[#CBFF00]/20 flex items-center justify-center">
+              <img src="/favicon.svg" alt="CONTUBER IA" className="w-7 h-7" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -70,6 +85,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
               <p className="text-xs text-zinc-400 flex items-center gap-1.5 font-medium">
+                <span className="text-white font-bold">Pre - asistente</span>
+                <span>•</span>
                 <span>Made in Brazil • Fase Promocional</span>
                 {isLoopActive && (
                   <span className="inline-flex items-center gap-1 text-[10px] text-[#CBFF00] bg-zinc-900 border border-[#CBFF00]/40 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
@@ -140,6 +157,19 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* User Account, KYC Badge, Settings & Quick Multi-Account Switcher */}
         <div className="hidden md:flex items-center gap-2.5">
+          {/* Partnership Trigger */}
+          {onOpenPartnership && (
+            <button
+              onClick={onOpenPartnership}
+              title="Postularse como Socio Estratégico, Inversor o Creador Fundador"
+              className="px-3 py-2 rounded-lg bg-gradient-to-r from-[#CBFF00] via-[#94ec00] to-[#00FFA3] hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-lg shadow-[#CBFF00]/20 active:scale-95"
+            >
+              <Handshake className="w-4 h-4 stroke-[2.5]" />
+              <span className="hidden lg:inline">QUIERO ASOCIARME</span>
+              <span className="lg:hidden">ASOCIARSE</span>
+            </button>
+          )}
+
           {/* Investor & FAQ Modal Trigger */}
           <button
             onClick={onOpenInvestorFAQ}
@@ -223,18 +253,61 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Mobile Logout if authenticated */}
-        {onLogout && (
-          <div className="md:hidden flex items-center justify-end w-full pt-1 border-t border-zinc-900">
+        {/* Mobile Action & Navigation Bar (Centered for e-mobile) */}
+        <div className="md:hidden flex flex-col items-center gap-2.5 w-full pt-2 border-t border-zinc-900">
+          <div className="flex items-center justify-center gap-2 w-full">
+            {onOpenPartnership && (
+              <button
+                onClick={onOpenPartnership}
+                className="flex-1 py-2 px-3 rounded-lg bg-gradient-to-r from-[#CBFF00] to-[#00FFA3] text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-[#CBFF00]/15"
+              >
+                <Handshake className="w-4 h-4 stroke-[2.5]" />
+                <span>Asociarme</span>
+              </button>
+            )}
+
             <button
-              onClick={onLogout}
-              className="text-[11px] text-zinc-400 hover:text-red-400 flex items-center gap-1 font-black uppercase py-1"
+              onClick={onOpenInvestorFAQ}
+              className="py-2 px-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Bloquear Terminal / Cerrar Sesión ({currentUser?.name || "Operador"})</span>
+              <HelpCircle className="w-3.5 h-3.5 text-[#CBFF00]" />
+              <span>Dossier</span>
+            </button>
+
+            <button
+              onClick={onOpenSettings}
+              className="py-2 px-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#CBFF00] text-xs font-bold flex items-center justify-center gap-1"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              <span>Ajustes</span>
             </button>
           </div>
-        )}
+
+          <div className="flex items-center justify-between w-full text-xs gap-2">
+            <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 flex-1 min-w-0">
+              <User className="w-3 h-3 text-zinc-400 shrink-0" />
+              <select
+                value={selectedProfileName}
+                onChange={(e) => onChangeProfile(e.target.value)}
+                className="bg-transparent border-none text-zinc-200 focus:outline-none font-bold text-xs truncate w-full"
+              >
+                <option value="Perfil Principal: Creador Pro" className="bg-zinc-950 text-zinc-200">Perfil Principal: Creador Pro</option>
+                <option value="Canal Tech & AI Secundario" className="bg-zinc-950 text-zinc-200">Canal Tech & IA (Sub-cuenta)</option>
+                <option value="Tienda E-Com & Afiliados" className="bg-zinc-950 text-zinc-200">Tienda E-Commerce Global</option>
+              </select>
+            </div>
+
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="text-[11px] text-zinc-400 hover:text-red-400 flex items-center gap-1 font-bold uppercase py-1.5 px-2 rounded-lg bg-zinc-900 border border-zinc-800 shrink-0"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Bloquear</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </header>
   );

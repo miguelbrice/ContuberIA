@@ -17,7 +17,9 @@ import {
   AlertTriangle,
   HelpCircle,
   Mail,
-  Check
+  Check,
+  Handshake,
+  ExternalLink
 } from "lucide-react";
 
 export interface UserSession {
@@ -33,9 +35,15 @@ export interface UserSession {
 
 interface LoginScreenProps {
   onLoginSuccess: (session: UserSession) => void;
+  onOpenPartnership?: () => void;
+  onOpenInvestorFAQ?: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ 
+  onLoginSuccess,
+  onOpenPartnership,
+  onOpenInvestorFAQ
+}) => {
   // Mode: "login" (FE-1), "register" (FE-2), "forgot" (FE-1.4)
   const [viewMode, setViewMode] = useState<"login" | "register" | "forgot">("login");
 
@@ -288,36 +296,57 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     <div className="min-h-screen bg-black text-zinc-100 font-sans flex flex-col justify-between antialiased selection:bg-[#CBFF00] selection:text-black p-4 md:p-8">
       
       {/* Top Brand Bar */}
-      <header className="max-w-6xl w-full mx-auto flex items-center justify-between py-4 border-b border-zinc-900">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#CBFF00] p-0.5 shadow-lg shadow-[#CBFF00]/20 flex items-center justify-center">
-            <div className="w-full h-full bg-black rounded-[10px] flex items-center justify-center">
-              <Zap className="w-5 h-5 text-[#CBFF00] fill-[#CBFF00]/20" />
-            </div>
+      <header className="max-w-6xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 py-4 border-b border-zinc-900 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-[#CBFF00]/50 p-1.5 shadow-lg shadow-[#CBFF00]/20 flex items-center justify-center shrink-0">
+            <img src="/favicon.svg" alt="CONTUBER IA" className="w-8 h-8" />
           </div>
-          <div>
+          <div className="flex flex-col items-center sm:items-start">
             <div className="flex items-center gap-2">
               <span className="font-black text-xl text-white tracking-tight">CONTUBER <span className="text-[#CBFF00]">IA</span></span>
               <span className="text-[9px] font-black bg-[#CBFF00] text-black px-2 py-0.5 rounded-full tracking-wider uppercase">
                 PROTOTIPO 🇧🇷
               </span>
-              <span className="text-[9px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">
+              <span className="hidden sm:inline text-[9px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">
                 2027 - 2030
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400 font-medium">Startup Prototipo Promocional • Made in Brazil</p>
+            <p className="text-[11px] text-zinc-400 font-medium flex items-center justify-center sm:justify-start gap-1.5 mt-0.5">
+              <span className="text-white font-bold">Pre - asistente</span>
+              <span>•</span>
+              <span>Made in Brazil • Fase Promocional</span>
+            </p>
           </div>
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 bg-zinc-950 border border-zinc-800/80 px-3 py-1.5 rounded-xl text-xs text-zinc-400 font-medium">
-          <ShieldCheck className="w-4 h-4 text-[#CBFF00] stroke-[2.5]" />
-          <span>Acceso Creadores (LGPD Brasil / TLS 1.3)</span>
+        <div className="flex items-center justify-center gap-2.5 w-full sm:w-auto">
+          {onOpenInvestorFAQ && (
+            <button
+              type="button"
+              onClick={onOpenInvestorFAQ}
+              className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#CBFF00]/40 text-zinc-300 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-[#CBFF00]" />
+              <span>Dossier / FAQ</span>
+            </button>
+          )}
+
+          {onOpenPartnership && (
+            <button
+              type="button"
+              onClick={onOpenPartnership}
+              className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-[#CBFF00] to-[#00FFA3] hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-[#CBFF00]/20 active:scale-95"
+            >
+              <Handshake className="w-4 h-4 stroke-[2.5]" />
+              <span>Quiero Asociarme</span>
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Center Authentication Card */}
-      <main className="flex-1 flex items-center justify-center py-10">
-        <div className="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      {/* Center Visual Container (Aligned for e-mobile and Web) */}
+      <main className="flex-1 flex flex-col items-center justify-center py-6 sm:py-10 px-2 sm:px-4 w-full max-w-lg mx-auto space-y-4">
+        <div className="w-full bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
           
           {/* Subtle accent line */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#CBFF00] to-transparent opacity-80" />
@@ -727,6 +756,31 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             </>
           )}
 
+        </div>
+
+        {/* Spectator Partnership Callout (Centered for e-mobile & web) */}
+        <div className="w-full bg-gradient-to-r from-zinc-950 via-black to-zinc-950 border border-zinc-800/90 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-center gap-3 w-full sm:w-auto text-left">
+            <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-[#CBFF00]/40 text-[#CBFF00] flex items-center justify-center shrink-0 shadow-md shadow-[#CBFF00]/10">
+              <Handshake className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-white flex items-center gap-1.5">
+                <span>¿Deseas asociarte a Contuber IA?</span>
+                <span className="text-[9px] font-mono text-[#CBFF00] bg-zinc-900 px-1 py-0.2 rounded border border-[#CBFF00]/30">SEED</span>
+              </p>
+              <p className="text-[10px] text-zinc-400">Oportunidad para Creadores Fundadores, Inversores y Partners.</p>
+            </div>
+          </div>
+          {onOpenPartnership && (
+            <button
+              type="button"
+              onClick={onOpenPartnership}
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#CBFF00] hover:bg-[#b8e600] text-black text-xs font-black uppercase tracking-wider shrink-0 cursor-pointer shadow-md shadow-[#CBFF00]/20 active:scale-95 transition-transform text-center"
+            >
+              POSTULARME
+            </button>
+          )}
         </div>
       </main>
 

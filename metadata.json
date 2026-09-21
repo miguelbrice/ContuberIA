@@ -1,6 +1,6 @@
 {
-  "name": "Pre-Asistente de Monetización e Ingresos IA",
-  "description": "Contuber IA: Startup prototipo promocional (Made in Brazil). Monitor inteligente de monetización multi-plataforma, arquitectura de subsistemas para creadores, cumplimiento LGPD y simulación promocional previa al despliegue total 2027-2030.",
+  "name": "CONTUBER IA | Pre - asistente",
+  "description": "Contuber IA: Startup prototipo promocional (Made in Brazil). Monitor inteligente de monetización multi-plataforma, arquitectura de subsistemas para creadores y dossier de inversión para alianzas estratégicas.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

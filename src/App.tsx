@@ -49,9 +49,32 @@ import { PayoutModal } from "./components/PayoutModal";
 import { AIChannelAuditor } from "./components/AIChannelAuditor";
 import { SettingsModal } from "./components/SettingsModal";
 import { InvestorFAQModal } from "./components/InvestorFAQModal";
+import { PartnershipModal } from "./components/PartnershipModal";
 import { LoginScreen, UserSession } from "./components/LoginScreen";
 
 export default function App() {
+  // Enforce tab title and browser tab favicon for spectator & logged in users on all domains (including contuberia-startup.vercel.app)
+  useEffect(() => {
+    document.title = "CONTUBER IA | Pre - asistente";
+
+    const updateOrCreateIcon = (rel: string, href: string, type?: string, sizes?: string) => {
+      let el = document.querySelector(`link[rel='${rel}']${type ? `[type='${type}']` : ''}`) as HTMLLinkElement;
+      if (!el) {
+        el = document.createElement("link");
+        el.rel = rel;
+        if (type) el.type = type;
+        if (sizes) el.sizes = sizes;
+        document.head.appendChild(el);
+      }
+      el.href = href;
+    };
+
+    updateOrCreateIcon("icon", "/favicon.ico", "image/x-icon");
+    updateOrCreateIcon("shortcut icon", "/favicon.ico");
+    updateOrCreateIcon("icon", "/favicon.svg", "image/svg+xml");
+    updateOrCreateIcon("apple-touch-icon", "/apple-touch-icon.png", undefined, "180x180");
+  }, []);
+
   // Authentication & Session State (Scenario 1, 2, 3)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
@@ -105,6 +128,7 @@ export default function App() {
   const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isInvestorModalOpen, setIsInvestorModalOpen] = useState(false);
+  const [isPartnershipModalOpen, setIsPartnershipModalOpen] = useState(false);
   const [auditAccount, setAuditAccount] = useState<PlatformAccount | null>(null);
 
   // User Settings State (FE-4: Privacidad, IA, KYC, ID)
@@ -292,7 +316,23 @@ export default function App() {
 
   // Scenario 1 & 2: If not authenticated, the URL starts on the login screen
   if (!isAuthenticated) {
-    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <>
+        <LoginScreen 
+          onLoginSuccess={handleLoginSuccess} 
+          onOpenPartnership={() => setIsPartnershipModalOpen(true)}
+          onOpenInvestorFAQ={() => setIsInvestorModalOpen(true)}
+        />
+        <PartnershipModal
+          isOpen={isPartnershipModalOpen}
+          onClose={() => setIsPartnershipModalOpen(false)}
+        />
+        <InvestorFAQModal
+          isOpen={isInvestorModalOpen}
+          onClose={() => setIsInvestorModalOpen(false)}
+        />
+      </>
+    );
   }
 
   return (
@@ -310,6 +350,7 @@ export default function App() {
         onOpenNewAccount={() => setIsNewAccountModalOpen(true)}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         onOpenInvestorFAQ={() => setIsInvestorModalOpen(true)}
+        onOpenPartnership={() => setIsPartnershipModalOpen(true)}
         hideLiveBalances={userSettings.privacy.hideLiveBalances}
         selectedProfileName={selectedProfileName}
         onChangeProfile={setSelectedProfileName}
@@ -518,17 +559,23 @@ export default function App() {
         onClose={() => setIsInvestorModalOpen(false)}
       />
 
+      <PartnershipModal
+        isOpen={isPartnershipModalOpen}
+        onClose={() => setIsPartnershipModalOpen(false)}
+      />
+
       {/* Footer */}
       <footer className="mt-auto border-t border-zinc-900 bg-black py-6 px-4 text-xs text-zinc-400">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-zinc-900 pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-[#CBFF00] p-0.5 flex items-center justify-center">
-                <span className="font-black text-black text-xs">CT</span>
+              <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-[#CBFF00]/50 p-1 flex items-center justify-center shadow-md shadow-[#CBFF00]/10">
+                <img src="/favicon.svg" alt="CONTUBER IA" className="w-5 h-5" />
               </div>
               <div>
                 <p className="font-black tracking-tight text-white flex items-center gap-2">
                   <span>CONTUBER IA</span>
+                  <span className="text-[10px] text-zinc-400">| Pre - asistente</span>
                   <span className="text-[9px] bg-[#CBFF00] text-black px-1.5 py-0.2 rounded font-mono font-bold">MADE IN BRAZIL 🇧🇷</span>
                   <span className="text-[10px] text-zinc-400 font-mono">Startup Prototipo Promocional</span>
                 </p>
@@ -541,10 +588,18 @@ export default function App() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setIsInvestorModalOpen(true)}
-                className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-[#CBFF00] hover:text-black border border-[#CBFF00]/40 text-[#CBFF00] text-xs font-bold transition-colors cursor-pointer"
+                onClick={() => setIsPartnershipModalOpen(true)}
+                className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#CBFF00] to-[#00FFA3] hover:brightness-110 text-black font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-[#CBFF00]/20 cursor-pointer active:scale-95"
               >
-                Abrir Dossier de Inversión & FAQ
+                🤝 Quiero Asociarme
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsInvestorModalOpen(true)}
+                className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-[#CBFF00]/40 text-[#CBFF00] text-xs font-bold transition-colors cursor-pointer"
+              >
+                Abrir Dossier & FAQ
               </button>
             </div>
           </div>
